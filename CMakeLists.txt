@@ -1,0 +1,10 @@
+SET( EXTENSION_NAME "Extensions_SDLImage")
+
+ADD_LIBRARY( ${EXTENSION_NAME}
+  Resources/SDLImage.cpp
+)
+
+TARGET_LINK_LIBRARIES( ${EXTENSION_NAME}
+  OpenEngine_Core
+  ${SDLIMAGE_LIBRARY}
+)
