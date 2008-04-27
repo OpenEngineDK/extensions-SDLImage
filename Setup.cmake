@@ -1,1 +1,2 @@
-Find_Package ( SDL_image REQUIRED )
+INCLUDE(${OE_CURRENT_EXTENSION_DIR}/FindSDL_image.cmake)
+INCLUDE(${OE_CURRENT_EXTENSION_DIR}/SetupSDL_image.cmake)

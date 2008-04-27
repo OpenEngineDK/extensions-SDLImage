@@ -21,8 +21,20 @@ using OpenEngine::Utils::Convert;
 bool SDLImage::sdlloaded = false;
 
 SDLImagePlugin::SDLImagePlugin() {
+    this->AddExtension("bmp");
+    this->AddExtension("gif");
+    this->AddExtension("jpeg");
+    this->AddExtension("jpg");
+    this->AddExtension("lbm");
+    this->AddExtension("pcx");
     this->AddExtension("png");
-    //TODO: add: BMP, GIF, JPEG, LBM, PCX, PNG, PNM, TGA, TIFF, XCF, XPM, XV
+    this->AddExtension("pnm");
+    this->AddExtension("tiff");
+    this->AddExtension("tif");
+    this->AddExtension("tga");
+    this->AddExtension("xcf");
+    this->AddExtension("xpm");
+    this->AddExtension("xv");
 }
 
 ITextureResourcePtr SDLImagePlugin::CreateResource(string file) {
@@ -43,15 +55,48 @@ SDLImage::~SDLImage() {
 void SDLImage::Load() {
     if (loaded) return;
 
-    SDL_Surface *tmp = NULL;
-    if ((tmp= IMG_Load(filename.c_str())) == NULL)
+    if ((image= IMG_Load(filename.c_str())) == NULL)
       throw ResourceException("Error loading SDLImage data in: " + filename);
-    image = SDL_DisplayFormat(tmp); //TODO free in destructor
-    //måske:    Surf_Return = SDL_DisplayFormatAlpha(Surf_Temp);
-    //eller noget med: SDL_SetAlpha(srcimg, SDL_SRCALPHA, alpha);
-    SDL_FreeSurface(tmp);    
 
-    loaded = true;
+    depth = image->format->BitsPerPixel;
+    if (depth != 32 && depth != 24) {
+        string msg = "Unsupported color depth: ";
+	msg += Convert::int2string(depth) + " in file: " + filename;
+	throw ResourceException(msg);
+    }
+
+    SDL_PixelFormat fmt;
+    switch (depth) {
+    case 24:
+      {
+	  //It's 24 bit, so always convert
+	  SDL_PixelFormat format = {NULL, 24, 4, 0, 0, 0, 0, 0, 8, 16, 24,
+				    0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000, 0, 255};
+	  fmt = format;
+      }
+      break;
+    case 32:
+      {
+	  // It's 32 bit, so convert only if it's ABGR
+	  if (image->format->Rshift > image->format->Bshift) {
+	      SDL_PixelFormat format = {NULL, 32, 4, 0, 0, 0, 0, 0, 8, 16, 24,
+					0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000, 0, 255};
+	      fmt = format;
+	  }
+      }
+      break;
+      default:
+ 	  fmt = *(image->format);
+      }
+
+      SDL_Surface *temp = SDL_ConvertSurface(image, &fmt, SDL_SWSURFACE);
+      SDL_FreeSurface(image);
+      image = temp;
+
+      //flip vertecally
+      ReverseVertecally();
+
+      loaded = true;
 }
 
 void SDLImage::Unload() {
@@ -64,18 +109,24 @@ void SDLImage::Unload() {
 int SDLImage::GetID(){
     return id;
 }
+
 void SDLImage::SetID(int id){
     this->id = id;
 }	
+
 int SDLImage::GetWidth(){
     return image->w;
 }
+
 int SDLImage::GetHeight(){
     return image->h;
 }
+
 int SDLImage::GetDepth(){
-    return image->format->BitsPerPixel;
+  logger.info << "depth=" << depth<< " in file: " << filename << logger.end;
+  return depth;
 }
+
 unsigned char* SDLImage::GetData(){
   return (unsigned char*)image->pixels;
 }

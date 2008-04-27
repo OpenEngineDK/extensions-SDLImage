@@ -22,7 +22,8 @@
 #include <boost/serialization/split_member.hpp>
 #include <Logging/Logger.h>
 
-#include <SDL/SDL_image.h>
+//@todo make a SDL_image in Meta to suppot different platforms
+#include <SDL_image.h>
 
 namespace OpenEngine {
 namespace Resources {
@@ -75,13 +76,12 @@ public:
     void Unload();
 
     // texture resource methods
-	int GetID();
-	void SetID(int id);   
+    int GetID();
+    void SetID(int id);   
     int GetWidth();
-	int GetHeight();
-	int GetDepth();
-	unsigned char* GetData();
-
+    int GetHeight();
+    int GetDepth();
+    unsigned char* GetData();
 };
 
 /**
