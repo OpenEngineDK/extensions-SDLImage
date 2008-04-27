@@ -123,7 +123,6 @@ int SDLImage::GetHeight(){
 }
 
 int SDLImage::GetDepth(){
-  logger.info << "depth=" << depth<< " in file: " << filename << logger.end;
   return depth;
 }
 
