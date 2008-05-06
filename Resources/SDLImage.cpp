@@ -13,6 +13,9 @@
 #include <Resources/File.h>
 #include <Utils/Convert.h>
 
+//@todo make a SDL_image in Meta to suppot different platforms
+#include <SDL_image.h>
+
 namespace OpenEngine {
 namespace Resources {
 
@@ -55,6 +58,7 @@ SDLImage::~SDLImage() {
 void SDLImage::Load() {
     if (loaded) return;
 
+    SDL_Surface* image;
     if ((image= IMG_Load(filename.c_str())) == NULL)
       throw ResourceException("Error loading SDLImage data in: " + filename);
 
@@ -93,6 +97,16 @@ void SDLImage::Load() {
       SDL_FreeSurface(image);
       image = temp;
 
+      width = image->w;
+      height = image->h;
+
+      unsigned int numberOfCharsPerColor = (depth/8);
+      unsigned int lineWidth = GetWidth() * numberOfCharsPerColor;
+      unsigned long size = lineWidth * GetHeight();
+      data = new unsigned char[size];
+      memcpy(data, image->pixels, size);
+      SDL_FreeSurface(image);
+
       //flip vertecally
       ReverseVertecally();
 
@@ -101,7 +115,7 @@ void SDLImage::Load() {
 
 void SDLImage::Unload() {
     if (loaded) {
-        SDL_FreeSurface(image);
+        delete[] data;
         loaded = false;
     }
 }
@@ -115,11 +129,11 @@ void SDLImage::SetID(int id){
 }	
 
 int SDLImage::GetWidth(){
-    return image->w;
+  return width;
 }
 
 int SDLImage::GetHeight(){
-    return image->h;
+    return height;
 }
 
 int SDLImage::GetDepth(){
@@ -127,7 +141,7 @@ int SDLImage::GetDepth(){
 }
 
 unsigned char* SDLImage::GetData(){
-  return (unsigned char*)image->pixels;
+  return data;
 }
 
 } //NS Resources

@@ -22,9 +22,6 @@
 #include <boost/serialization/split_member.hpp>
 #include <Logging/Logger.h>
 
-//@todo make a SDL_image in Meta to suppot different platforms
-#include <SDL_image.h>
-
 namespace OpenEngine {
 namespace Resources {
 
@@ -37,7 +34,6 @@ using namespace std;
  */
 class SDLImage : public ITextureResource {
 private:
-    SDL_Surface* image;
     bool loaded;
     int id;                     //!< material identifier
     string filename;            //!< file name
