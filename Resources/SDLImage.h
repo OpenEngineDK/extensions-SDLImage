@@ -78,6 +78,8 @@ public:
     int GetHeight();
     int GetDepth();
     unsigned char* GetData();
+    virtual void ReverseVertecally();
+
 };
 
 /**

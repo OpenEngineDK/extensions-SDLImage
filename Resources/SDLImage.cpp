@@ -120,6 +120,20 @@ void SDLImage::Unload() {
     }
 }
 
+void SDLImage::ReverseVertecally() {
+    unsigned int numberOfCharsPerColor = (depth/8);
+    unsigned int lineWidth = GetWidth() * numberOfCharsPerColor;
+    unsigned long size = lineWidth * GetHeight();
+    unsigned char* tempArr = new unsigned char[size];
+
+    for (int i=0, j=size-lineWidth; i < size;
+	 i+=lineWidth, j-=lineWidth) {
+	memcpy(&tempArr[j], &data[i], lineWidth);
+    }
+    delete data;
+    data = tempArr;
+}
+
 int SDLImage::GetID(){
     return id;
 }
