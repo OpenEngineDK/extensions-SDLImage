@@ -126,7 +126,7 @@ void SDLImage::ReverseVertecally() {
     unsigned long size = lineWidth * GetHeight();
     unsigned char* tempArr = new unsigned char[size];
 
-    for (int i=0, j=size-lineWidth; i < size;
+    for (unsigned int i=0, j=size-lineWidth; i < size;
 	 i+=lineWidth, j-=lineWidth) {
 	memcpy(&tempArr[j], &data[i], lineWidth);
     }
