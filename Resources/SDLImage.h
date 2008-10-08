@@ -12,7 +12,7 @@
 #define _SDL_IMAGE_H_
 
 #include <Resources/ITextureResource.h>
-#include <Resources/ResourcePlugin.h>
+#include <Resources/IResourcePlugin.h>
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -38,9 +38,9 @@ private:
     int id;                     //!< material identifier
     string filename;            //!< file name
     unsigned char* data;        //!< binary material data
-    int width;                  //!< texture width
-    int height;                 //!< texture height
-    int depth;                  //!< texture depth/bits
+    unsigned int width;                  //!< texture width
+    unsigned int height;                 //!< texture height
+    unsigned int depth;                  //!< texture depth/bits
 
 public:
 
@@ -74,12 +74,12 @@ public:
     // texture resource methods
     int GetID();
     void SetID(int id);   
-    int GetWidth();
-    int GetHeight();
-    int GetDepth();
+    unsigned int GetWidth();
+    unsigned int GetHeight();
+    unsigned int GetDepth();
     unsigned char* GetData();
+    ColorFormat GetColorFormat();
     virtual void ReverseVertecally();
-
 };
 
 /**
@@ -87,7 +87,7 @@ public:
  *
  * @class SDLImagePlugin SDLImage.h Resources/SDLImage.h
  */
-class SDLImagePlugin : public ResourcePlugin<ITextureResource> {
+class SDLImagePlugin : public IResourcePlugin<ITextureResource> {
 public:
     SDLImagePlugin();
     ITextureResourcePtr CreateResource(string file);

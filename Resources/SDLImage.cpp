@@ -52,72 +52,86 @@ SDLImage::SDLImage(string filename)
 }
 
 SDLImage::~SDLImage() {
-    Unload();
+    if (loaded) {
+        delete[] data;
+        loaded = false;
+    }
 }
 
 void SDLImage::Load() {
     if (loaded) return;
 
-    SDL_Surface* image;
-    if ((image= IMG_Load(filename.c_str())) == NULL)
-      throw ResourceException("Error loading SDLImage data in: " + filename);
+    SDL_Surface* image = IMG_Load(filename.c_str());
+    if (!image)
+        throw ResourceException("Error loading SDLImage data in: " + filename);
 
     depth = image->format->BitsPerPixel;
     if (depth != 32 && depth != 24) {
         string msg = "Unsupported color depth: ";
-	msg += Convert::int2string(depth) + " in file: " + filename;
-	throw ResourceException(msg);
+        msg += Convert::ToString(depth) + " in file: " + filename;
+        throw ResourceException(msg);
     }
 
-    SDL_PixelFormat fmt;
-    switch (depth) {
+    SDL_PixelFormat format;
+    switch(depth) {
+    case 32: 
+        format.palette = 0; format.colorkey = 0; format.alpha = 0;
+        format.BitsPerPixel = 32; format.BytesPerPixel = 4;
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+        format.Rmask = 0xFF000000; format.Rshift = 0; format.Rloss = 0;
+        format.Gmask = 0x00FF0000; format.Gshift = 8; format.Gloss = 0;
+        format.Bmask = 0x0000FF00; format.Bshift = 16; format.Bloss = 0;
+        format.Amask = 0x000000FF; format.Ashift = 24; format.Aloss = 0;
+#else
+        format.Rmask = 0x000000FF; format.Rshift = 24; format.Rloss = 0;
+        format.Gmask = 0x0000FF00; format.Gshift = 16; format.Gloss = 0;
+        format.Bmask = 0x00FF0000; format.Bshift = 8; format.Bloss = 0;
+        format.Amask = 0xFF000000; format.Ashift = 0; format.Aloss = 0;
+#endif
+        break;
     case 24:
-      {
-	  //It's 24 bit, so always convert
-	  SDL_PixelFormat format = {NULL, 24, 4, 0, 0, 0, 0, 0, 8, 16, 24,
-				    0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000, 0, 255};
-	  fmt = format;
-      }
-      break;
-    case 32:
-      {
-	  // It's 32 bit, so convert only if it's ABGR
-	  if (image->format->Rshift > image->format->Bshift) {
-	      SDL_PixelFormat format = {NULL, 32, 4, 0, 0, 0, 0, 0, 8, 16, 24,
-					0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000, 0, 255};
-	      fmt = format;
-	  }
-      }
-      break;
-      default:
- 	  fmt = *(image->format);
-      }
+        format.palette = 0; format.colorkey = 0; format.alpha = 0;
+        format.BitsPerPixel = 24; format.BytesPerPixel = 3;
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+        format.Rmask = 0xFF000000; format.Rshift = 0; format.Rloss = 0;
+        format.Gmask = 0x00FF0000; format.Gshift = 8; format.Gloss = 0;
+        format.Bmask = 0x0000FF00; format.Bshift = 16; format.Bloss = 0;
+#else
+        format.Rmask = 0x000000FF; format.Rshift = 24; format.Rloss = 0;
+        format.Gmask = 0x0000FF00; format.Gshift = 16; format.Gloss = 0;
+        format.Bmask = 0x00FF0000; format.Bshift = 8; format.Bloss = 0;
+#endif
+        break;
+    default:
+        throw Exception("unsupported color depth, in file: " + filename);
+    }
 
-      SDL_Surface *temp = SDL_ConvertSurface(image, &fmt, SDL_SWSURFACE);
-      SDL_FreeSurface(image);
-      image = temp;
+    SDL_LockSurface(image);
+    SDL_Surface* converted = SDL_ConvertSurface(image, &format, SDL_SWSURFACE);
+    if (converted == NULL)
+        throw ResourceException("Error converting SDLImage data in: " +
+                                filename);
+    SDL_LockSurface(converted);
+    SDL_FreeSurface(image);
 
-      width = image->w;
-      height = image->h;
+    width = converted->w;
+    height = converted->h;
+    depth = converted->format->BitsPerPixel;
 
-      unsigned int numberOfCharsPerColor = (depth/8);
-      unsigned int lineWidth = GetWidth() * numberOfCharsPerColor;
-      unsigned long size = lineWidth * GetHeight();
-      data = new unsigned char[size];
-      memcpy(data, image->pixels, size);
-      SDL_FreeSurface(image);
+    unsigned int numberOfCharsPerColor = (depth/8);
+    unsigned int lineWidth = GetWidth() * numberOfCharsPerColor;
+    unsigned long size = lineWidth * GetHeight();
+    data = new unsigned char[size];
+    memcpy(data, converted->pixels, size);
+    SDL_FreeSurface(converted);
+    
+    //flip vertecally
+    ReverseVertecally();
 
-      //flip vertecally
-      ReverseVertecally();
-
-      loaded = true;
+    loaded = true;
 }
 
 void SDLImage::Unload() {
-    if (loaded) {
-        delete[] data;
-        loaded = false;
-    }
 }
 
 void SDLImage::ReverseVertecally() {
@@ -134,28 +148,39 @@ void SDLImage::ReverseVertecally() {
     data = tempArr;
 }
 
-int SDLImage::GetID(){
+int SDLImage::GetID() {
     return id;
 }
 
-void SDLImage::SetID(int id){
+void SDLImage::SetID(int id) {
     this->id = id;
 }	
 
-int SDLImage::GetWidth(){
+unsigned int SDLImage::GetWidth() {
   return width;
 }
 
-int SDLImage::GetHeight(){
+unsigned int SDLImage::GetHeight() {
     return height;
 }
 
-int SDLImage::GetDepth(){
+unsigned int SDLImage::GetDepth() {
   return depth;
 }
 
-unsigned char* SDLImage::GetData(){
+unsigned char* SDLImage::GetData() {
   return data;
+}
+
+ColorFormat SDLImage::GetColorFormat() {
+    if (depth==32)
+        return RGBA;
+    else if (depth==24)
+        return RGB;
+    else if (depth==8)
+        return LUMINANCE;
+    else
+        throw Exception("unknown color depth");
 }
 
 } //NS Resources
