@@ -144,7 +144,7 @@ void SDLImage::ReverseVertecally() {
 	 i+=lineWidth, j-=lineWidth) {
 	memcpy(&tempArr[j], &data[i], lineWidth);
     }
-    delete data;
+    delete[] data;
     data = tempArr;
 }
 
