@@ -63,7 +63,7 @@ void SDLImage::Load() {
 
     SDL_Surface* image = IMG_Load(filename.c_str());
     if (!image)
-        throw ResourceException("Error loading SDLImage data in: " + filename);
+        throw ResourceException("Error loading SDLImage data in: " + filename + ". Description: " + SDL_GetError());
 
     depth = image->format->BitsPerPixel;
     if (depth != 32 && depth != 24) {
