@@ -18,6 +18,7 @@
 #include <fstream>
 
 #include <boost/serialization/base_object.hpp>
+#include <boost/serialization/extended_type_info.hpp>
 #include <boost/serialization/export.hpp>
 #include <boost/serialization/split_member.hpp>
 #include <Logging/Logger.h>
