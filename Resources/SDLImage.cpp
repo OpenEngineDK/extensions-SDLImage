@@ -48,7 +48,7 @@ SDLImage::SDLImage(string filename)
     : loaded(false),
       filename(filename),
       data(NULL) {
-    width = height = depth = id = 0;
+    width = height = this->channels = id = 0;
 }
 
 SDLImage::~SDLImage() {
@@ -65,7 +65,7 @@ void SDLImage::Load() {
     if (!image)
         throw ResourceException("Error loading SDLImage data in: " + filename + ". Description: " + SDL_GetError());
 
-    depth = image->format->BitsPerPixel;
+    unsigned int depth = image->format->BitsPerPixel;
     if (depth != 32 && depth != 24) {
         string msg = "Unsupported color depth: ";
         msg += Convert::ToString(depth) + " in file: " + filename;
@@ -118,8 +118,8 @@ void SDLImage::Load() {
     height = converted->h;
     depth = converted->format->BitsPerPixel;
 
-    unsigned int numberOfCharsPerColor = (depth/8);
-    unsigned int lineWidth = GetWidth() * numberOfCharsPerColor;
+    this->channels = (depth/8);
+    unsigned int lineWidth = GetWidth() * this->channels;
     unsigned long size = lineWidth * GetHeight();
     data = new unsigned char[size];
     memcpy(data, converted->pixels, size);
@@ -135,8 +135,7 @@ void SDLImage::Unload() {
 }
 
 void SDLImage::ReverseVertecally() {
-    unsigned int numberOfCharsPerColor = (depth/8);
-    unsigned int lineWidth = GetWidth() * numberOfCharsPerColor;
+    unsigned int lineWidth = GetWidth() * this->channels;
     unsigned long size = lineWidth * GetHeight();
     unsigned char* tempArr = new unsigned char[size];
 
@@ -164,20 +163,16 @@ unsigned int SDLImage::GetHeight() {
     return height;
 }
 
-unsigned int SDLImage::GetDepth() {
-  return depth;
-}
-
 unsigned char* SDLImage::GetData() {
   return data;
 }
 
 ColorFormat SDLImage::GetColorFormat() {
-    if (depth==32)
+    if (this->channels == 4)
         return RGBA;
-    else if (depth==24)
+    else if (this->channels == 3)
         return RGB;
-    else if (depth==8)
+    else if (this->channels == 1)
         return LUMINANCE;
     else
         throw Exception("unknown color depth");
