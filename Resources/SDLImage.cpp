@@ -45,21 +45,16 @@ ITextureResourcePtr SDLImagePlugin::CreateResource(string file) {
 }
 
 SDLImage::SDLImage(string filename)
-    : loaded(false),
-      filename(filename),
-      data(NULL) {
-    width = height = this->channels = id = 0;
+    : ITextureResource(), 
+      filename(filename) {
 }
 
 SDLImage::~SDLImage() {
-    if (loaded) {
-        delete[] data;
-        loaded = false;
-    }
+    this->Unload();
 }
 
 void SDLImage::Load() {
-    if (loaded) return;
+    if (this->data) return;
 
     SDL_Surface* image = IMG_Load(filename.c_str());
     if (!image)
@@ -114,24 +109,34 @@ void SDLImage::Load() {
     SDL_LockSurface(converted);
     SDL_FreeSurface(image);
 
-    width = converted->w;
-    height = converted->h;
+    this->width = converted->w;
+    this->height = converted->h;
     depth = converted->format->BitsPerPixel;
-
     this->channels = (depth/8);
+
     unsigned int lineWidth = GetWidth() * this->channels;
     unsigned long size = lineWidth * GetHeight();
-    data = new unsigned char[size];
-    memcpy(data, converted->pixels, size);
+    this->data = new unsigned char[size];
+    memcpy(this->data, converted->pixels, size);
     SDL_FreeSurface(converted);
     
     //flip vertecally
     ReverseVertecally();
 
-    loaded = true;
-}
-
-void SDLImage::Unload() {
+    // Set format
+    switch(this->channels){
+    case 1:
+        this->format = LUMINANCE;
+        break;
+    case 3:
+        this->format = RGB;
+        break;
+    case 4:
+        this->format = RGBA;
+        break;
+    default:
+        throw Exception("unknown color format");
+    }
 }
 
 void SDLImage::ReverseVertecally() {
@@ -145,37 +150,6 @@ void SDLImage::ReverseVertecally() {
     }
     delete[] data;
     data = tempArr;
-}
-
-int SDLImage::GetID() {
-    return id;
-}
-
-void SDLImage::SetID(int id) {
-    this->id = id;
-}	
-
-unsigned int SDLImage::GetWidth() {
-  return width;
-}
-
-unsigned int SDLImage::GetHeight() {
-    return height;
-}
-
-unsigned char* SDLImage::GetData() {
-  return data;
-}
-
-ColorFormat SDLImage::GetColorFormat() {
-    if (this->channels == 4)
-        return RGBA;
-    else if (this->channels == 3)
-        return RGB;
-    else if (this->channels == 1)
-        return LUMINANCE;
-    else
-        throw Exception("unknown color depth");
 }
 
 } //NS Resources

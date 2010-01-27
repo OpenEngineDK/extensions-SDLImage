@@ -35,12 +35,7 @@ using namespace std;
  */
 class SDLImage : public ITextureResource {
 private:
-    bool loaded;
-    int id;                     //!< material identifier
     string filename;            //!< file name
-    unsigned char* data;        //!< binary material data
-    unsigned int width;                  //!< texture width
-    unsigned int height;                 //!< texture height
 
 public:
 
@@ -57,27 +52,17 @@ public:
         ar & filename;
     }
 
-    SDLImage() : loaded(false),data(NULL) {
-        width = height = id = 0;
-    };
+    SDLImage() : ITextureResource() {}
+    SDLImage(string file);
+    ~SDLImage();
 
     static bool sdlloaded;
     static void InitSDL();
 
-    SDLImage(string file);
-    ~SDLImage();
-
     // resource methods
     void Load();
-    void Unload();
 
     // texture resource methods
-    int GetID();
-    void SetID(int id);   
-    unsigned int GetWidth();
-    unsigned int GetHeight();
-    unsigned char* GetData();
-    ColorFormat GetColorFormat();
     virtual void ReverseVertecally();
 };
 
