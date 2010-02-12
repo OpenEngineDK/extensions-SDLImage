@@ -1,11 +1,11 @@
 // SDL image resource.
 // -------------------------------------------------------------------
-// Copyright (C) 2007 OpenEngine.dk (See AUTHORS) 
+// Copyright (C) 2007 OpenEngine.dk (See AUTHORS)
 // Modified by Anders Bach Nielsen <abachn@daimi.au.dk> - 21. Nov 2007
-// 
-// This program is free software; It is covered by the GNU General 
-// Public License version 2 or any later version. 
-// See the GNU General Public License for more details (see LICENSE). 
+//
+// This program is free software; It is covered by the GNU General
+// Public License version 2 or any later version.
+// See the GNU General Public License for more details (see LICENSE).
 //--------------------------------------------------------------------
 
 #ifndef _SDL_IMAGE_H_
@@ -17,16 +17,16 @@
 #include <iostream>
 #include <fstream>
 
-#include <boost/serialization/base_object.hpp>
-#include <boost/serialization/extended_type_info.hpp>
-#include <boost/serialization/export.hpp>
-#include <boost/serialization/split_member.hpp>
 #include <Logging/Logger.h>
 
 namespace OpenEngine {
 namespace Resources {
 
 using namespace std;
+
+class IArchiveWriter;
+class IArchiveReader;
+
 
 /**
  * SDL image resource.
@@ -48,7 +48,7 @@ public:
     //    friend class boost::serialization::access;
     template<class Archive>
     void serialize(Archive& ar, const unsigned int version) {
-        ar & boost::serialization::base_object<ITexture2D>(*this);
+        ar & boost::serialization::base_object<ITextureResource>(*this);
         ar & filename;
     }
 
@@ -64,6 +64,9 @@ public:
 
     // texture resource methods
     virtual void ReverseVertecally();
+
+    void Serialize(Resources::IArchiveWriter& );
+    void Deserialize(Resources::IArchiveReader& );
 };
 
 /**
@@ -91,6 +94,5 @@ public:
 } //NS Resources
 } //NS OpenEngine
 
-BOOST_CLASS_EXPORT(OpenEngine::Resources::SDLImage)
 
 #endif // _SDL_IMAGE_H_

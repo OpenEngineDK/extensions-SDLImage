@@ -12,6 +12,8 @@
 #include <Resources/Exceptions.h>
 #include <Resources/File.h>
 #include <Utils/Convert.h>
+#include <Resources/IArchiveWriter.h>
+#include <Resources/IArchiveReader.h>
 
 //@todo make a SDL_image in Meta to suppot different platforms
 #include <SDL_image.h>
@@ -175,6 +177,13 @@ void SDLImage::ReverseVertecally() {
     }
     delete[] data;
     this->data = tempArr;
+}
+
+void SDLImage::Serialize(IArchiveWriter& w) {
+    w.WriteString("filename",filename);
+}
+void SDLImage::Deserialize(IArchiveReader& r) {
+    filename = r.ReadString("filename");
 }
 
 } //NS Resources
