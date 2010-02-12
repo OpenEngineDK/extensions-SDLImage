@@ -3,6 +3,6 @@ SET(CMAKE_LIBRARY_PATH ${OE_LIB_DIR}/sdlimage/lib/static)
 INCLUDE(${CMAKE_ROOT}/Modules/FindSDL_image.cmake)
 INCLUDE(${OE_CURRENT_EXTENSION_DIR}/SetupSDL_image.cmake)
 
-OE_ADD_SERIALIZABLE_OBJECTS( Extension_SDLImage
+OE_ADD_SERIALIZABLE_OBJECTS(Extensions_SDLImage
   Resources/SDLImage
 )
