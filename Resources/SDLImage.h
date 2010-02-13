@@ -33,7 +33,7 @@ class IArchiveReader;
  *
  * @class SDLImage SDLImage.h Resources/SDLImage.h
  */
-class SDLImage : public Texture2D<unsigned char> {
+class SDLImage : public ITextureResource {
 private:
     string filename;            //!< file name
 
@@ -52,7 +52,7 @@ public:
         ar & filename;
     }
 
-    SDLImage() : Texture2D<unsigned char>() {}
+    SDLImage() : ITextureResource() {}
     SDLImage(string file);
     ~SDLImage();
 
