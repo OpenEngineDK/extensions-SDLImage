@@ -40,12 +40,33 @@ SDLImagePlugin::SDLImagePlugin() {
     this->AddExtension("xv");
 }
 
-ITextureResourcePtr SDLImagePlugin::CreateResource(string file) {
-    return ITextureResourcePtr(new SDLImage(file));
+ITexture2DPtr SDLImagePlugin::CreateResource(string file) {
+    return ITexture2DPtr(new SDLImage(file));
+}
+
+UCharSDLImagePlugin::UCharSDLImagePlugin() {
+    this->AddExtension("bmp");
+    this->AddExtension("gif");
+    this->AddExtension("jpeg");
+    this->AddExtension("jpg");
+    this->AddExtension("lbm");
+    this->AddExtension("pcx");
+    this->AddExtension("png");
+    this->AddExtension("pnm");
+    this->AddExtension("tiff");
+    this->AddExtension("tif");
+    this->AddExtension("tga");
+    this->AddExtension("xcf");
+    this->AddExtension("xpm");
+    this->AddExtension("xv");
+}
+
+UCharTexture2DPtr UCharSDLImagePlugin::CreateResource(string file) {
+    return UCharTexture2DPtr(new SDLImage(file));
 }
 
 SDLImage::SDLImage(string filename)
-    : ITextureResource(), 
+    : Texture2D<unsigned char>(), 
       filename(filename) {
 }
 
@@ -142,14 +163,15 @@ void SDLImage::Load() {
 void SDLImage::ReverseVertecally() {
     unsigned int lineWidth = GetWidth() * this->channels;
     unsigned long size = lineWidth * GetHeight();
+    unsigned char* data = (unsigned char*) this->data;
     unsigned char* tempArr = new unsigned char[size];
 
     for (unsigned int i=0, j=size-lineWidth; i < size;
 	 i+=lineWidth, j-=lineWidth) {
-	memcpy(&tempArr[j], &data[i], lineWidth);
+        memcpy(&tempArr[j], &data[i], lineWidth);
     }
     delete[] data;
-    data = tempArr;
+    this->data = tempArr;
 }
 
 } //NS Resources

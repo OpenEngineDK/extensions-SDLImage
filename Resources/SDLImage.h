@@ -11,7 +11,7 @@
 #ifndef _SDL_IMAGE_H_
 #define _SDL_IMAGE_H_
 
-#include <Resources/ITextureResource.h>
+#include <Resources/Texture2D.h>
 #include <Resources/IResourcePlugin.h>
 #include <string>
 #include <iostream>
@@ -33,7 +33,7 @@ using namespace std;
  *
  * @class SDLImage SDLImage.h Resources/SDLImage.h
  */
-class SDLImage : public ITextureResource {
+class SDLImage : public Texture2D<unsigned char> {
 private:
     string filename;            //!< file name
 
@@ -48,11 +48,11 @@ public:
     //    friend class boost::serialization::access;
     template<class Archive>
     void serialize(Archive& ar, const unsigned int version) {
-        ar & boost::serialization::base_object<ITextureResource>(*this);
+        ar & boost::serialization::base_object<ITexture2D>(*this);
         ar & filename;
     }
 
-    SDLImage() : ITextureResource() {}
+    SDLImage() : Texture2D<unsigned char>() {}
     SDLImage(string file);
     ~SDLImage();
 
@@ -71,10 +71,21 @@ public:
  *
  * @class SDLImagePlugin SDLImage.h Resources/SDLImage.h
  */
-class SDLImagePlugin : public IResourcePlugin<ITextureResource> {
+class SDLImagePlugin : public IResourcePlugin<ITexture2D> {
 public:
     SDLImagePlugin();
-    ITextureResourcePtr CreateResource(string file);
+    ITexture2DPtr CreateResource(string file);
+};
+
+/**
+ * SDL image texture resource plug-in.
+ *
+ * @class UCharSDLImagePlugin SDLImage.h Resources/SDLImage.h
+ */
+class UCharSDLImagePlugin : public IResourcePlugin<UCharTexture2D> {
+public:
+    UCharSDLImagePlugin();
+    UCharTexture2DPtr CreateResource(string file);
 };
 
 } //NS Resources
