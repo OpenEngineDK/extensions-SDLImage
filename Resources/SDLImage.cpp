@@ -82,6 +82,9 @@ void SDLImage::Load() {
         throw ResourceException("Error loading SDLImage data in: " + filename + ". Description: " + SDL_GetError());
 
     unsigned int depth = image->format->BitsPerPixel;
+
+    depth = 32; // Evil hack, but it works!
+
     if (depth != 32 && depth != 24) {
         string msg = "Unsupported color depth: ";
         msg += Convert::ToString(depth) + " in file: " + filename;
