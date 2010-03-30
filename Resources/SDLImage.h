@@ -16,6 +16,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <Resources/ISerializable.h>
 
 #include <Logging/Logger.h>
 
@@ -33,7 +34,9 @@ class IArchiveReader;
  *
  * @class SDLImage SDLImage.h Resources/SDLImage.h
  */
-class SDLImage : public ITextureResource {
+
+class SDLImage : public Texture2D<unsigned char> {
+    OE_SERIALIZABLE_OBJECT(SDLImage)
 private:
     string filename;            //!< file name
 
@@ -45,14 +48,8 @@ public:
      * @param file tga file to load.
      */
 
-    //    friend class boost::serialization::access;
-    template<class Archive>
-    void serialize(Archive& ar, const unsigned int version) {
-        ar & boost::serialization::base_object<ITextureResource>(*this);
-        ar & filename;
-    }
-
-    SDLImage() : ITextureResource() {}
+    SDLImage() : Texture2D<unsigned char>() {}
+    
     SDLImage(string file);
     ~SDLImage();
 
