@@ -1,6 +1,6 @@
 # source
-git /extensions/SDLImage               https://github.com/OpenEngineDK/extensions-SDLImage.git
-git-dev /extensions/SDLImage           git@github.com:OpenEngineDK/extensions-SDLImage.git
+git /extensions/SDLImage               https://github.com/OpenEngineDK/extensions-SDLImage.git
+git-dev /extensions/SDLImage           git@github.com:OpenEngineDK/extensions-SDLImage.git
 
 # win lib
 win32 /libraries http://openengine.dk/data/libraries/sdlimage-win32.zip
